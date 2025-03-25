@@ -6,10 +6,12 @@ const { validationResult } = require("express-validator");
 module.exports.register = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    console.log(errors.array());
     return res.status(400).json({ errors: errors.array() });
   }
 
   const { username, fullname, email, password } = req.body;
+  console.log(req.body);
 
   try {
     const existingUser = await userModel.findOne({ email });
@@ -39,6 +41,7 @@ module.exports.register = async (req, res) => {
       user: {
         email: newUser.email,
         username: newUser.username,
+        role: newUser.role,
         userId: newUser._id,
       },
     });
@@ -58,6 +61,7 @@ module.exports.login = async (req, res) => {
   }
 
   const { email, password } = req.body;
+  console.log(req.body);
 
   try {
     const user = await userModel.findOne({ email });
@@ -81,6 +85,7 @@ module.exports.login = async (req, res) => {
         id: user._id,
         email: user.email,
 
+        role: user.role,
         username: user.username,
       },
       process.env.JWT_SECRET || "CLIENT_SECRET_KEY",
@@ -92,21 +97,57 @@ module.exports.login = async (req, res) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
       })
+      .status(200)
       .json({
         success: true,
         message: "Login successful",
         user: {
           email: user.email,
-
+          role: user.role,
           userId: user._id,
           userName: user.username,
+          name: user.name,
+          token,
         },
       });
   } catch (error) {
     console.error(`Error occurred during login: ${error.message}`);
     res.status(500).json({
       success: false,
-      message: "An error occurred during login",
+      message: "Error occured when login",
     });
   }
+};
+
+module.exports.authMiddleware = async (req, res, next) => {
+  const token = req.cookies.token;
+
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      message: "Unauthorized: No token provided",
+    });
+  }
+
+  try {
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || "CLIENT_SECRET_KEY"
+    );
+    req.user = decoded;
+    next();
+  } catch (error) {
+    console.error(`Token verification failed: ${error.message}`);
+    return res.status(401).json({
+      success: false,
+      message: "Unauthorized: Invalid token",
+    });
+  }
+};
+
+module.exports.logoutUser = (req, res) => {
+  res.clearCookie("token").json({
+    success: true,
+    message: "Logged out successfully",
+  });
 };
