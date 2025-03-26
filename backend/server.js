@@ -14,11 +14,12 @@ const userRoutes = require("./routes/user.routes");
 const hotelRoutes = require("./routes/hotel.routes");
 const hotelCLoudinary = require("./helpers/cloudinary");
 const bookingRoutes = require("./routes/hotelbooknow.routes");
-
+const adminTravelRoutes = require("./routes/admintravel.routes");
+const userTravelRoutes = require("./routes/usertravel.routes");
 app.use(
   cors({
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST", "DELETE", "PUT"],
+    origin: "*", // Allow requests from anywhere
+    methods: ["GET", "POST", "DELETE", "PATCH", "PUT"],
     allowedHeaders: [
       "Content-Type",
       "Authorization",
@@ -39,6 +40,11 @@ app.use("/auth/user/api", userRoutes);
 app.use("/admin/api", hotelRoutes);
 app.use("/admin/api/image", hotelCLoudinary);
 app.use("/api/bookings", bookingRoutes);
+// Admin routes (protected)
+app.use("/api/v1/admin/travel-packages", adminTravelRoutes);
+
+// User/public routes
+app.use("/api/v1/travel-packages", userTravelRoutes);
 
 // Start the server
 app.listen(PORT, (err) => {

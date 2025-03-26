@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../UI/sheet";
+import { AddHomeTwoTone, TravelExplore } from "@mui/icons-material";
 
 // Declare the menu items properly
 const adminSidebarMenuItems = [
@@ -15,7 +16,7 @@ const adminSidebarMenuItems = [
     id: "Hotels",
     label: "Add Hotels",
     path: "/admin/addhotel",
-    icon: <Hotel size={20} />,
+    icon: <AddHomeTwoTone size={20} />,
   },
   {
     id: "Hotel",
@@ -28,6 +29,12 @@ const adminSidebarMenuItems = [
     label: "Booked",
     path: "/admin/booked",
     icon: <BadgeCheck size={20} />,
+  },
+  {
+    id: "Travel",
+    label: "AddTravelPackage",
+    path: "/traveling/package",
+    icon: <TravelExplore size={20} />,
   },
 ];
 

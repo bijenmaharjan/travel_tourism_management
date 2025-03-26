@@ -114,7 +114,6 @@ const UserHotelTile = ({ hotels }) => {
                   </div>
                 </div>
                 {/* Fixed position button at bottom */}
-                // Modify the button click handler to pass the hotel ID
                 <button
                   onClick={() => setSelectedHotel(hotel)}
                   className="mt-4 w-full bg-pink-500 hover:bg-pink-600 text-white py-2 rounded-lg transition-colors duration-300 font-medium flex items-center justify-center"
