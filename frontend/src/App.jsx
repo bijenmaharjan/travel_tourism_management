@@ -73,9 +73,9 @@ const App = () => {
         <Route
           path="/travel"
           element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+            
               <Layout />
-            </CheckAuth>
+           
           }
         >
           <Route path="home" element={<Home />} />

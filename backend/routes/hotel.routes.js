@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const hotelController = require("../controllers/hotel.controller");
 
-
 // Route for creating a hotel
 router.post("/create-hotel", hotelController.createHotel);
 

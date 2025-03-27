@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { UploadCloudIcon, XIcon, FileIcon } from "lucide-react";
+import { UploadCloudIcon, XIcon, FileIcon, Trash2Icon } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
@@ -7,11 +7,11 @@ import { toast } from "react-toastify";
 import axios from "axios";
 
 const ImageUpload = ({
-  hotelImage,
-  setHotelImage,
-  hotelImageUrl,
-  setHotelImageUrl,
-  setFormData,
+  hotelImage = [],
+  setHotelImage = () => {},
+  hotelImageUrl = [],
+  setHotelImageUrl = () => {},
+  setFormData = () => {},
 }) => {
   const [imageLoading, setImageLoading] = useState(false);
   const [dragging, setDragging] = useState(false);
@@ -19,6 +19,14 @@ const ImageUpload = ({
 
   const handleRemoveImage = (index) => {
     setHotelImage(hotelImage.filter((_, i) => i !== index));
+  };
+
+  const handleRemoveUploadedImage = (index) => {
+    setHotelImageUrl(hotelImageUrl.filter((_, i) => i !== index));
+    setFormData((prevData) => ({
+      ...prevData,
+      images: hotelImageUrl.filter((_, i) => i !== index),
+    }));
   };
 
   const handleDragLeave = () => {
@@ -35,18 +43,23 @@ const ImageUpload = ({
     setDragging(false);
     const droppedFiles = Array.from(event.dataTransfer.files);
     if (droppedFiles.length > 0) {
-      setHotelImage((prev) => [...prev, ...droppedFiles]);
+      setHotelImage((prev) => [...(prev || []), ...droppedFiles]);
     }
   };
 
   const handleImageFileChange = (event) => {
     const selectedFiles = Array.from(event.target.files);
     if (selectedFiles.length > 0) {
-      setHotelImage((prev) => [...prev, ...selectedFiles]);
+      setHotelImage((prev) => [...(prev || []), ...selectedFiles]);
     }
   };
 
   const handleUpload = async () => {
+    if (!hotelImage || hotelImage.length === 0) {
+      toast.error("Please select images to upload");
+      return;
+    }
+
     const uploadData = new FormData();
     hotelImage.forEach((file) => {
       uploadData.append("hotelimage", file);
@@ -64,16 +77,61 @@ const ImageUpload = ({
           timeout: 60000,
         }
       );
-      setHotelImageUrl(response.data.urls);
+
+      // Combine existing URLs with new ones
+      const updatedUrls = [...hotelImageUrl, ...response.data.urls];
+
+      setHotelImageUrl(updatedUrls);
       setFormData((prevData) => ({
         ...prevData,
-        images: response.data.urls,
+        images: updatedUrls,
       }));
+      setHotelImage([]); // Clear the selected files after upload
       setImageLoading(false);
       toast.success("Images uploaded successfully!");
     } catch (error) {
       console.error("Error uploading images:", error);
       toast.error("Error uploading images. Please try again.");
+      setImageLoading(false);
+    }
+  };
+
+  const handleReupload = async () => {
+    if (!hotelImage || hotelImage.length === 0) {
+      toast.error("Please select new images to upload");
+      return;
+    }
+
+    const uploadData = new FormData();
+    hotelImage.forEach((file) => {
+      uploadData.append("hotelimage", file);
+    });
+
+    try {
+      setImageLoading(true);
+      const response = await axios.post(
+        "http://localhost:9000/admin/api/image/upload",
+        uploadData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          timeout: 60000,
+        }
+      );
+
+      // Replace all existing URLs with new ones
+      setHotelImageUrl(response.data.urls);
+      setFormData((prevData) => ({
+        ...prevData,
+        images: response.data.urls,
+      }));
+      setHotelImage([]); // Clear the selected files after upload
+      setImageLoading(false);
+      toast.success("Images re-uploaded successfully!");
+    } catch (error) {
+      console.error("Error re-uploading images:", error);
+      toast.error("Error re-uploading images. Please try again.");
       setImageLoading(false);
     }
   };
@@ -101,7 +159,7 @@ const ImageUpload = ({
             multiple
             required
           />
-          {hotelImage.length === 0 ? (
+          {!hotelImage || hotelImage.length === 0 ? (
             <Label
               htmlFor="image-upload"
               className="flex flex-col items-center justify-center h-24 cursor-pointer"
@@ -136,32 +194,56 @@ const ImageUpload = ({
             </div>
           )}
         </div>
-        <button
-          type="button"
-          onClick={handleUpload}
-          disabled={hotelImage.length === 0}
-          className={`mt-2 w-full p-2 rounded-lg ${
-            hotelImage.length === 0
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-blue-500 text-white hover:bg-blue-600"
-          }`}
-        >
-          Upload Images
-        </button>
+
+        <div className="flex gap-2 mt-2">
+          <button
+            type="button"
+            onClick={handleUpload}
+            disabled={!hotelImage || hotelImage.length === 0}
+            className={`flex-1 p-2 rounded-lg ${
+              !hotelImage || hotelImage.length === 0
+                ? "bg-gray-300 cursor-not-allowed"
+                : "bg-blue-500 text-white hover:bg-blue-600"
+            }`}
+          >
+            Add Images
+          </button>
+
+          {hotelImageUrl.length > 0 && (
+            <button
+              type="button"
+              onClick={handleReupload}
+              disabled={!hotelImage || hotelImage.length === 0}
+              className={`flex-1 p-2 rounded-lg ${
+                !hotelImage || hotelImage.length === 0
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "bg-orange-500 text-white hover:bg-orange-600"
+              }`}
+            >
+              Replace All
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Uploaded Images Preview */}
-      {hotelImageUrl.length > 0 && (
+      {hotelImageUrl && hotelImageUrl.length > 0 && (
         <div className="mt-4">
           <h3 className="text-md font-semibold mb-2">Uploaded Images:</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
             {hotelImageUrl.map((url, index) => (
-              <div key={index} className="relative">
+              <div key={index} className="relative group">
                 <img
                   src={url}
                   alt={`uploaded-img-${index}`}
                   className="w-full h-24 object-cover rounded-lg shadow"
                 />
+                <button
+                  onClick={() => handleRemoveUploadedImage(index)}
+                  className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <Trash2Icon className="w-3 h-3" />
+                </button>
               </div>
             ))}
           </div>

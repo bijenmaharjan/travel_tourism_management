@@ -18,7 +18,6 @@ const adminTravelRoutes = require("./routes/admintravel.routes");
 const userTravelRoutes = require("./routes/usertravel.routes");
 app.use(
   cors({
-    origin: "*", // Allow requests from anywhere
     methods: ["GET", "POST", "DELETE", "PATCH", "PUT"],
     allowedHeaders: [
       "Content-Type",

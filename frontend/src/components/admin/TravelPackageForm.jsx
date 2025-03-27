@@ -21,6 +21,7 @@ import {
   Chip,
   Alert,
 } from "@mui/material";
+import ImageUpload from "./ImageUpload";
 
 const categories = [
   "Adventure",
@@ -52,6 +53,8 @@ const TravelPackageForm = ({ open, onClose, onSuccess, packageData }) => {
   });
   const [imageUrls, setImageUrls] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [hotelImage, setHotelImage] = useState([]);
+  const [hotelImageUrl, setHotelImageUrl] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -325,16 +328,13 @@ const TravelPackageForm = ({ open, onClose, onSuccess, packageData }) => {
                 onChange={handleChange}
               />
             </Grid>
-
             <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Image URLs (one per line)"
-                name="images"
-                value={imageUrls}
-                onChange={handleImagesChange}
-                multiline
-                rows={3}
+              <ImageUpload
+                hotelImage={hotelImage}
+                setHotelImage={setHotelImage}
+                hotelImageUrl={hotelImageUrl}
+                setHotelImageUrl={setHotelImageUrl}
+                setFormData={setFormData}
               />
             </Grid>
           </Grid>

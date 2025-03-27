@@ -10,7 +10,7 @@ import {
   FaClock,
   FaStar,
 } from "react-icons/fa";
-import UserViewDetails from "./UserViewDetails";
+import UserViewDetails from "../../components/user/UserViewDetails";
 
 const UserHotelTile = ({ hotels }) => {
   const [selectedHotel, setSelectedHotel] = useState(null);

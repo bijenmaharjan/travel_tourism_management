@@ -11,7 +11,7 @@ import { LogOut, Menu } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { logoutUser } from "../../store/auth";
 import { BsSearch } from "react-icons/bs";
-import UserSidebar from "../UserSidebar";
+import UserSidebar from "../user/UserSidebar";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
