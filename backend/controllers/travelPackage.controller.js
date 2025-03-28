@@ -20,46 +20,38 @@ exports.createTravelPackage = async (req, res) => {
 // Get all travel packages
 exports.getAllTravelPackages = async (req, res) => {
   try {
-    // Filtering
-    const queryObj = { ...req.query };
-    const excludedFields = ["page", "sort", "limit", "fields"];
-    excludedFields.forEach((el) => delete queryObj[el]);
-
-    // Advanced filtering
-    let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-
-    let query = Travel.find(JSON.parse(queryStr));
+    // Build query
+    let query = Travel.find();
 
     // Sorting
     if (req.query.sort) {
       const sortBy = req.query.sort.split(",").join(" ");
       query = query.sort(sortBy);
-    } else {
-      query = query.sort("-createdAt");
     }
 
     // Field limiting
     if (req.query.fields) {
       const fields = req.query.fields.split(",").join(" ");
       query = query.select(fields);
-    } else {
-      query = query.select("-__v");
     }
 
     // Pagination
-    const page = req.query.page * 1 || 1;
-    const limit = req.query.limit * 1 || 10;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    query = query.skip(skip).limit(limit);
+    const total = await Travel.countDocuments();
+    const packages = await query.skip(skip).limit(limit);
 
-    const travelPackages = await query;
-
-    res.status(200).json({
+    res.json({
       success: true,
-      results: travelPackages.length,
-      data: travelPackages,
+      data: packages,
+      pagination: {
+        page,
+        pages: Math.ceil(total / limit),
+        limit,
+        total,
+      },
     });
   } catch (error) {
     res.status(500).json({
@@ -68,7 +60,6 @@ exports.getAllTravelPackages = async (req, res) => {
     });
   }
 };
-
 module.exports.getAllPackagesTravel = async (req, res) => {
   try {
     const hotels = await Travel.find();

@@ -1,26 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllHotels } from "../../store/admin/admin";
 import { fetchTravelPackages } from "../../store/admin/admintravel";
-import PackageCard from "../../components/user/PackageTile";
+import PackageGrid from "../../components/user/PackageTile"; // Changed from PackageTile to PackageGrid
 import UserHotelTile from "../../components/user/UserHotelTile";
 import SupportClientbox from "../../components/user/SupportClientbox";
 import Footer from "../../components/management/Footer";
 
-
 const Home = () => {
   const { hotelList } = useSelector((state) => state.adminHotel);
-  const { packages } = useSelector((state) => state.travelPackage);
-  console.log("travelPackages", packages);
+  const { packages = [], isLoading } = useSelector(
+    (state) => state.travelPackage || {}
+  );
   const dispatch = useDispatch();
-  const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = 15;
 
   useEffect(() => {
     dispatch(fetchAllHotels());
-  }, [dispatch]);
-
-  useEffect(() => {
     dispatch(fetchTravelPackages());
   }, [dispatch]);
 
@@ -52,29 +47,18 @@ const Home = () => {
           </button>
         </div>
       </div>
+
       {/* Hotels Listing Section */}
       {hotelList && hotelList.length > 0 && (
         <UserHotelTile hotels={hotelList} />
       )}
+
       <div className="w-full mt-30">
         <SupportClientbox />
       </div>
-      <div className="text-center mb-12 mt-30">
-        <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-          Explore Nepal's Hidden Treasures
-        </h2>
-        <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
-          Immersive tour packages combining adventure, culture, and breathtaking
-          scenery
-        </p>
-      </div>
-      <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4  py-12 px-4 sm:px-6 lg:px-8">
-        {packages.map((pkg) => (
-          <PackageCard key={pkg._id} package={pkg} />
-        ))}
-      </div>
 
-     
+      {/* Packages Section - Now using PackageGrid instead of manual grid */}
+      <PackageGrid packages={packages} />
 
       <Footer />
     </div>

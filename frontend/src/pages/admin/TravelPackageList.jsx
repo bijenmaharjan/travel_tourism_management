@@ -30,7 +30,7 @@ const TravelPackageList = () => {
   const { packages, isLoading, error } = useSelector(
     (state) => state.travelPackage
   );
-
+  // console.log("travelPackage", packages);
   const [openForm, setOpenForm] = useState(false);
   const [editPackage, setEditPackage] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
@@ -135,7 +135,8 @@ const TravelPackageList = () => {
                   {pkg?.duration?.days}d/{pkg?.duration?.nights}n
                 </TableCell>
                 <TableCell>
-                  NPR {(pkg?.price?.basePrice || 0) - (pkg?.price?.discount || 0)}
+                  NPR{" "}
+                  {(pkg?.price?.basePrice || 0) - (pkg?.price?.discount || 0)}
                 </TableCell>
                 <TableCell>
                   <IconButton

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { Menu } from "lucide-react";
+import { Filter, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
+
 
 const userSidebarMenuItems = [
   {
@@ -62,6 +63,8 @@ const MenuItems = ({ setOpen }) => {
           {menuItem.label}
         </div>
       ))}
+
+     
     </nav>
   );
 };

@@ -10,6 +10,7 @@ import {
   CreditCard,
   Shield,
 } from "lucide-react";
+import { FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa";
 
 const Footer = () => {
   return (
@@ -18,7 +19,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* About Company */}
           <div>
-            <h3 className="text-xl font-bold text-white mb-6">Travel Nepal</h3>
+            <h3 className="text-xl font-bold text-white mb-6">Yatri Nepal</h3>
             <p className="mb-6">
               Your trusted travel partner for unforgettable experiences in
               Nepal's majestic landscapes and vibrant culture.
@@ -122,11 +123,22 @@ const Footer = () => {
               </div>
               <div className="flex items-center">
                 <Phone className="w-5 h-5 mr-3 flex-shrink-0" />
-                <span>+977-1-1234567</span>
+                <span>+977 9828027653</span>
               </div>
               <div className="flex items-center">
                 <Mail className="w-5 h-5 mr-3 flex-shrink-0" />
-                <span>info@travelnepal.com</span>
+                <span>yatri@travelnepal.com</span>
+              </div>
+              <div className="flex items-center gap-10 mt-9">
+                <span>
+                  <FaFacebook />
+                </span>
+                <span>
+                  <FaTwitter />
+                </span>
+                <span>
+                  <FaInstagram />
+                </span>
               </div>
             </div>
           </div>
@@ -141,9 +153,9 @@ const Footer = () => {
                 <CreditCard className="w-6 h-6" />
                 <span>Visa</span>
                 <CreditCard className="w-6 h-6" />
-                <span>MasterCard</span>
-                <CreditCard className="w-6 h-6" />
-                <span>PayPal</span>
+
+                <span>Esewa</span>
+                <span>Khalti</span>
               </div>
             </div>
             <div className="flex items-center">

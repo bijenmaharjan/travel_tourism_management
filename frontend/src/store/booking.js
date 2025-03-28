@@ -131,7 +131,7 @@ const bookingSlice = createSlice({
     resetBookingState: (state) => {
       state.status = "idle";
       state.error = null;
-      state.booking = null;
+      state.bookings = null;
     },
     setCurrentBooking: (state, action) => {
       state.currentBooking = action.payload;
