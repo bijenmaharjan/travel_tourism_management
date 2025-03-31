@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllHotels } from "../../store/admin/admin";
 import { fetchTravelPackages } from "../../store/admin/admintravel";
-import PackageGrid from "../../components/user/PackageTile"; // Changed from PackageTile to PackageGrid
+import PackageGrid from "../../components/user/PackageGrid"; // Changed from PackageTile to PackageGrid
 import UserHotelTile from "../../components/user/UserHotelTile";
 import SupportClientbox from "../../components/user/SupportClientbox";
 import Footer from "../../components/management/Footer";

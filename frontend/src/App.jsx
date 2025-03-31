@@ -22,6 +22,7 @@ import CreateHotel from "./pages/admin/CreateHotel";
 import AdminBookings from "./pages/admin/AdminBooked";
 
 import TravelPackageList from "./pages/admin/TravelPackageList";
+import PackagesByCategoryPage from "./components/user/PackageByCategoryPage";
 
 const App = () => {
   const { user, isAuthenticated, isLoading } = useSelector(
@@ -68,16 +69,13 @@ const App = () => {
         </Route>
         <Route path="/traveling" element={<AdminLayout />}>
           <Route path="package" element={<TravelPackageList />} />
+          <Route
+            path="/categories-packages"
+            element={<PackagesByCategoryPage />}
+          />
         </Route>
         //user
-        <Route
-          path="/travel"
-          element={
-            
-              <Layout />
-           
-          }
-        >
+        <Route path="/travel" element={<Layout />}>
           <Route path="home" element={<Home />} />
         </Route>
         <Route path="/unauth-page" element={<Unauthorized />} />

@@ -12,10 +12,13 @@ import { useDispatch } from "react-redux";
 import { logoutUser } from "../../store/auth";
 import { BsSearch } from "react-icons/bs";
 import UserSidebar from "../user/UserSidebar";
+import { useSearchParams, useNavigate } from "react-router-dom";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -23,6 +26,10 @@ const Header = () => {
 
   const handleLogoutUser = () => {
     dispatch(logoutUser());
+  };
+
+  const handleCategoryClick = (category) => {
+    navigate(`/packages?category=${encodeURIComponent(category)}`);
   };
 
   return (
@@ -44,26 +51,30 @@ const Header = () => {
           <Button
             variant="ghost"
             className="text-white hover:bg-gradient-to-r hover:from-pink-500 hover:to-yellow-500 transition duration-300 px-6 py-2 rounded-lg text-lg"
+            onClick={() => handleCategoryClick("Adventure")}
           >
-            Tour Packages
+            Adventure Tours
           </Button>
           <Button
             variant="ghost"
             className="text-white hover:bg-gradient-to-r hover:from-pink-500 hover:to-yellow-500 transition duration-300 px-6 py-2 rounded-lg text-lg"
+            onClick={() => handleCategoryClick("Cultural")}
           >
-            Blog
+            Cultural Tours
           </Button>
           <Button
             variant="ghost"
             className="text-white hover:bg-gradient-to-r hover:from-pink-500 hover:to-yellow-500 transition duration-300 px-6 py-2 rounded-lg text-lg"
+            onClick={() => handleCategoryClick("Trekking")}
           >
-            About Us
+            Trekking
           </Button>
           <Button
             variant="ghost"
             className="text-white hover:bg-gradient-to-r hover:from-pink-500 hover:to-yellow-500 transition duration-300 px-6 py-2 rounded-lg text-lg"
+            onClick={() => handleCategoryClick("Wildlife")}
           >
-            Contact
+            Wildlife
           </Button>
           <Button
             variant="ghost"
@@ -129,17 +140,29 @@ const Header = () => {
               align="end"
               className="bg-white mt-5 lg:hidden shadow-xl border border-gray-300 rounded-lg w-48 transition-transform transform ease-out duration-300"
             >
-              <DropdownMenuItem className="px-4 py-2 text-lg text-gray-700 hover:bg-gradient-to-r hover:from-pink-500 hover:to-yellow-500 transition duration-300 rounded-md">
-                Tour Packages
+              <DropdownMenuItem
+                className="px-4 py-2 text-lg text-gray-700 hover:bg-gradient-to-r hover:from-pink-500 hover:to-yellow-500 transition duration-300 rounded-md"
+                onClick={() => handleCategoryClick("Adventure")}
+              >
+                Adventure Tours
               </DropdownMenuItem>
-              <DropdownMenuItem className="px-4 py-2 text-lg text-gray-700 hover:bg-gradient-to-r hover:from-pink-500 hover:to-yellow-500 transition duration-300 rounded-md">
-                Blog
+              <DropdownMenuItem
+                className="px-4 py-2 text-lg text-gray-700 hover:bg-gradient-to-r hover:from-pink-500 hover:to-yellow-500 transition duration-300 rounded-md"
+                onClick={() => handleCategoryClick("Cultural")}
+              >
+                Cultural Tours
               </DropdownMenuItem>
-              <DropdownMenuItem className="px-4 py-2 text-lg text-gray-700 hover:bg-gradient-to-r hover:from-pink-500 hover:to-yellow-500 transition duration-300 rounded-md">
-                About Us
+              <DropdownMenuItem
+                className="px-4 py-2 text-lg text-gray-700 hover:bg-gradient-to-r hover:from-pink-500 hover:to-yellow-500 transition duration-300 rounded-md"
+                onClick={() => handleCategoryClick("Trekking")}
+              >
+                Trekking
               </DropdownMenuItem>
-              <DropdownMenuItem className="px-4 py-2 text-lg text-gray-700 hover:bg-gradient-to-r hover:from-pink-500 hover:to-yellow-500 transition duration-300 rounded-md">
-                Contact
+              <DropdownMenuItem
+                className="px-4 py-2 text-lg text-gray-700 hover:bg-gradient-to-r hover:from-pink-500 hover:to-yellow-500 transition duration-300 rounded-md"
+                onClick={() => handleCategoryClick("Wildlife")}
+              >
+                Wildlife
               </DropdownMenuItem>
               <DropdownMenuItem className="px-4 py-2 text-lg text-gray-700 hover:bg-gradient-to-r hover:from-pink-500 hover:to-yellow-500 transition duration-300 rounded-md">
                 Search
