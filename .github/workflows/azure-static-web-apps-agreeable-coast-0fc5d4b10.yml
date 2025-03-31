@@ -2,12 +2,10 @@ name: Azure Static Web Apps CI/CD
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
     types: [opened, synchronize, reopened, closed]
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   build_and_deploy_job:
@@ -16,41 +14,39 @@ jobs:
     name: Build and Deploy Job
     steps:
       - uses: actions/checkout@v3
-        with:
-          submodules: true
-          lfs: false
 
-      # Install dependencies with --legacy-peer-deps to resolve React conflicts
-      - name: Install Dependencies
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
         working-directory: ./frontend
         run: |
+          # First check if react-font exists in package.json
+          if grep -q '"react-font"' package.json; then
+            # If exists, install specific working version
+            npm install react-font@1.2.1 --legacy-peer-deps
+          fi
           npm install --legacy-peer-deps
-          npm install react@latest react-dom@latest  # Optional: Ensure latest React versions
 
-      # Build the app (required for frameworks like React)
       - name: Build App
         working-directory: ./frontend
         run: npm run build
 
-      - name: Build And Deploy
-        id: builddeploy
+      - name: Deploy to Azure
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_AGREEABLE_COAST_0FC5D4B10 }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          action: "upload"
-          app_location: "./frontend"    # Source code directory
-          output_location: "build"     # Build output directory (e.g., React's build folder)
-          # api_location: ""           # Uncomment if you have an API
-          # app_build_command: "npm run build"  # Alternative if build step is separate
+          app_location: "./frontend"
+          output_location: "build"
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
     runs-on: ubuntu-latest
     name: Close Pull Request Job
     steps:
-      - name: Close Pull Request
-        id: closepullrequest
+      - name: Close PR
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_AGREEABLE_COAST_0FC5D4B10 }}
