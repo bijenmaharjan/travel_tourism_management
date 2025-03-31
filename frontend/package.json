@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "react-scripts build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -57,10 +57,10 @@
     "input-otp": "^1.4.2",
     "lucide-react": "^0.483.0",
     "next-themes": "^0.4.6",
-    "react": "^18.3.1",
+    "react": "^18.2.0",
     "react-day-picker": "^8.10.1",
-    "react-dom": "^18.3.1",
-    "react-font": "^1.2.1",
+    "react-dom": "^18.2.0",
+    "react-font": "^2.0.0",
     "react-hook-form": "^7.54.2",
     "react-icons": "^5.5.0",
     "react-redux": "^9.2.0",
