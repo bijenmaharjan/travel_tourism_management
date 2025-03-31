@@ -20,15 +20,16 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'  # 👈 Specify path to lock file
 
       - name: Install dependencies
         working-directory: ./frontend
         run: |
-          # Clean install to ensure all dependencies are properly installed
-          npm ci --legacy-peer-deps || npm install --legacy-peer-deps
-          # Explicitly install react-scripts if needed
-          if ! npm list react-scripts; then
-            npm install react-scripts@5.0.1 --legacy-peer-deps
+          # Use npm ci for production installs (requires package-lock.json)
+          if [ -f package-lock.json ]; then
+            npm ci --legacy-peer-deps
+          else
+            npm install --legacy-peer-deps
           fi
 
       - name: Build App
@@ -40,7 +41,7 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_AGREEABLE_COAST_0FC5D4B10 }}
           app_location: "./frontend"
-          output_location: "build"
+          output_location: "dist"  # Changed to match Vite's default output
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
