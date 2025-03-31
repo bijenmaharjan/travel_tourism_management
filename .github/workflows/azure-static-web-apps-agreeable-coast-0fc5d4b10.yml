@@ -19,16 +19,17 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
+          cache: 'npm'
 
       - name: Install dependencies
         working-directory: ./frontend
         run: |
-          # First check if react-font exists in package.json
-          if grep -q '"react-font"' package.json; then
-            # If exists, install specific working version
-            npm install react-font@1.2.1 --legacy-peer-deps
+          # Clean install to ensure all dependencies are properly installed
+          npm ci --legacy-peer-deps || npm install --legacy-peer-deps
+          # Explicitly install react-scripts if needed
+          if ! npm list react-scripts; then
+            npm install react-scripts@5.0.1 --legacy-peer-deps
           fi
-          npm install --legacy-peer-deps
 
       - name: Build App
         working-directory: ./frontend
