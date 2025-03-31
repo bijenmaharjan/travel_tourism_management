@@ -15,22 +15,23 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Validate package.json
+        working-directory: ./frontend
+        run: npm pkg get name || (echo "package.json syntax error" && exit 1)
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
           cache: 'npm'
-          cache-dependency-path: 'frontend/package-lock.json'  # 👈 Specify path to lock file
+          cache-dependency-path: 'frontend/package-lock.json'
 
       - name: Install dependencies
         working-directory: ./frontend
         run: |
-          # Use npm ci for production installs (requires package-lock.json)
-          if [ -f package-lock.json ]; then
-            npm ci --legacy-peer-deps
-          else
-            npm install --legacy-peer-deps
-          fi
+          npm install --legacy-peer-deps
+          # Optional: Verify critical dependencies
+          npm list react react-dom vite || exit 1
 
       - name: Build App
         working-directory: ./frontend
@@ -41,7 +42,7 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_AGREEABLE_COAST_0FC5D4B10 }}
           app_location: "./frontend"
-          output_location: "dist"  # Changed to match Vite's default output
+          output_location: "dist"
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
