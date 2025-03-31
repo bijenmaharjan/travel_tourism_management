@@ -42,7 +42,7 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_AGREEABLE_COAST_0FC5D4B10 }}
           app_location: "./frontend"
-          output_location: "dist"
+          output_location: "dist" 
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
