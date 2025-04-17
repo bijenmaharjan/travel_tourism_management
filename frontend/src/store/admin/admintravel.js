@@ -1,3 +1,4 @@
+import { Category } from "@mui/icons-material";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
@@ -49,6 +50,23 @@ export const updateTravelPackage = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(
         error.response?.data || "Failed to update package"
+      );
+    }
+  }
+);
+
+// Fetch packages by category
+export const fetchPackagesByCategory = createAsyncThunk(
+  "travelPackage/fetchByCategory",
+  async (category, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:9000/api/v1/admin/travel-packages/category/${category}`
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || "Failed to fetch packages by category"
       );
     }
   }
@@ -136,6 +154,18 @@ const travelPackageSlice = createSlice({
         );
       })
       .addCase(deleteTravelPackage.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchPackagesByCategory.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchPackagesByCategory.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.packages = action.payload;
+      })
+      .addCase(fetchPackagesByCategory.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });

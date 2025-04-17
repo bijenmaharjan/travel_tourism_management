@@ -8,7 +8,8 @@ import {
   Star,
 } from "lucide-react";
 
-const PackageCard = ({ package: pkg, onClick }) => {
+export const PackageCardTour = ({ package: pkg, onClick }) => {
+  console.log("package", pkg);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // Destructure with defaults
@@ -171,7 +172,7 @@ const PackageCard = ({ package: pkg, onClick }) => {
   );
 };
 
-const PackageGrid = ({ packages = [] }) => {
+export const PackageGrid = ({ packages = [] }) => {
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [filters, setFilters] = useState({
     sort: "",
@@ -295,16 +296,6 @@ const PackageGrid = ({ packages = [] }) => {
   return (
     <div className="bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-8xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-            Discover Amazing Travel Packages
-          </h2>
-          <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
-            Find your perfect vacation package in Nepal's most beautiful
-            locations
-          </p>
-        </div>
-
         {/* Filter Controls */}
         <div className="mb-8 bg-white p-4 rounded-lg shadow-sm">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
@@ -431,7 +422,7 @@ const PackageGrid = ({ packages = [] }) => {
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {paginatedPackages.length > 0 ? (
             paginatedPackages.map((pkg) => (
-              <PackageCard
+              <PackageCardTour
                 key={pkg._id || pkg.id}
                 package={pkg}
                 onClick={() => setSelectedPackage(pkg)}

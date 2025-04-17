@@ -22,7 +22,10 @@ import CreateHotel from "./pages/admin/CreateHotel";
 import AdminBookings from "./pages/admin/AdminBooked";
 
 import TravelPackageList from "./pages/admin/TravelPackageList";
-import PackagesByCategoryPage from "./components/user/PackageByCategoryPage";
+import TravelPackages from "./pages/user/TravelPackages";
+import HotelPackage from "./pages/user/HotelPackage";
+import AboutUs from "./pages/user/AboutUs";
+import ScrollToTop from "./components/user/ScrollToTop";
 
 const App = () => {
   const { user, isAuthenticated, isLoading } = useSelector(
@@ -47,6 +50,7 @@ const App = () => {
   return (
     <div className="flex flex-col overflow-hidden bg-white">
       <ToastContainer />
+      <ScrollToTop />
       <Routes>
         <Route
           path="/"
@@ -69,14 +73,12 @@ const App = () => {
         </Route>
         <Route path="/traveling" element={<AdminLayout />}>
           <Route path="package" element={<TravelPackageList />} />
-          <Route
-            path="/categories-packages"
-            element={<PackagesByCategoryPage />}
-          />
         </Route>
-        //user
         <Route path="/travel" element={<Layout />}>
           <Route path="home" element={<Home />} />
+          <Route path="travelPackage" element={<TravelPackages />} />
+          <Route path="userhotel" element={<HotelPackage />} />
+          <Route path="aboutus" element={<AboutUs />} />
         </Route>
         <Route path="/unauth-page" element={<Unauthorized />} />
         <Route path="*" element={<Nopage />} />
