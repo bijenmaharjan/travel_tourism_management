@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+  import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllHotels } from "../../store/admin/admin";
 import { fetchTravelPackages } from "../../store/admin/admintravel";
@@ -9,7 +9,6 @@ import { PackageCardTour } from "../../components/user/PackageGrid";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import ScrollToTop from "../../components/user/ScrollToTop";
 
-// Import placeholder images (replace with your actual images)
 import placeholder1 from "../../assets/images/image1.png";
 import placeholder2 from "../../assets/images/image2.png";
 import placeholder3 from "../../assets/images/image3.png";
@@ -177,6 +176,7 @@ const ImageSlideshow = ({ images }) => {
 const Home = () => {
   const { hotelList } = useSelector((state) => state.adminHotel);
   const { packages = [] } = useSelector((state) => state.travelPackage || {});
+
   const dispatch = useDispatch();
   const location = useLocation();
 

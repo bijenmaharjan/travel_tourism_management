@@ -3,135 +3,107 @@ import axios from "axios";
 
 const API_URL = "http://localhost:9000/api/bookings";
 
-// Existing createBooking thunk
+// Create
 export const createBooking = createAsyncThunk(
   "booking/create",
   async ({ bookingData, token }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `${API_URL}/createbooking`,
-        bookingData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      if (error.response) {
-        return rejectWithValue(error.response.data.message || "Booking failed");
-      }
-      return rejectWithValue(error.message);
+      const res = await axios.post(`${API_URL}/create`, bookingData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Booking failed");
     }
   }
 );
 
-// Get all bookings
+// Fetch All
 export const getBookings = createAsyncThunk(
   "booking/getAll",
   async (token, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_URL}/getallbookings`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const res = await axios.get(API_URL, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-      return response.data;
-    } catch (error) {
-      if (error.response) {
-        return rejectWithValue(
-          error.response.data.message || "Failed to fetch bookings"
-        );
-      }
-      return rejectWithValue(error.message);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to fetch bookings"
+      );
     }
   }
 );
 
-// Get booking by ID
+// ✅ Fix: Fetch By ID
 export const getBookingById = createAsyncThunk(
   "booking/getById",
   async ({ id, token }, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_URL}/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const res = await axios.get(`${API_URL}/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-      return response.data;
-    } catch (error) {
-      if (error.response) {
-        return rejectWithValue(
-          error.response.data.message || "Failed to fetch booking"
-        );
-      }
-      return rejectWithValue(error.message);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to fetch booking by ID"
+      );
     }
   }
 );
 
-// Update booking
+// Update
 export const updateBooking = createAsyncThunk(
   "booking/update",
   async ({ id, bookingData, token }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`${API_URL}/update/${id}`, bookingData, {
+      const res = await axios.put(`${API_URL}/update/${id}`, bookingData, {
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
-      return response.data;
-    } catch (error) {
-      if (error.response) {
-        return rejectWithValue(error.response.data.message || "Update failed");
-      }
-      return rejectWithValue(error.message);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Update failed");
     }
   }
 );
 
-// Delete booking
+// Delete
 export const deleteBooking = createAsyncThunk(
   "booking/delete",
   async ({ id, token }, { rejectWithValue }) => {
     try {
       await axios.delete(`${API_URL}/delete/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       return id;
-    } catch (error) {
-      if (error.response) {
-        return rejectWithValue(error.response.data.message || "Delete failed");
-      }
-      return rejectWithValue(error.message);
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Delete failed");
     }
   }
 );
 
-const initialState = {
-  bookings: [],
-  currentBooking: null,
-  loading: false,
-  error: null,
-  fetchStatus: "idle",
-  fetchError: null,
-  updateStatus: "idle",
-  updateError: null,
-};
-
+// Slice
 const bookingSlice = createSlice({
   name: "booking",
-  initialState,
+  initialState: {
+    bookings: [],
+    currentBooking: null,
+    status: "idle",
+    error: null,
+    fetchStatus: "idle",
+    fetchError: null,
+    updateStatus: "idle",
+    updateError: null,
+  },
   reducers: {
     resetBookingState: (state) => {
       state.status = "idle";
       state.error = null;
-      state.bookings = null;
+      state.currentBooking = null;
     },
     setCurrentBooking: (state, action) => {
       state.currentBooking = action.payload;
@@ -139,10 +111,8 @@ const bookingSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Create Booking
       .addCase(createBooking.pending, (state) => {
         state.status = "loading";
-        state.error = null;
       })
       .addCase(createBooking.fulfilled, (state, action) => {
         state.status = "succeeded";
@@ -153,10 +123,8 @@ const bookingSlice = createSlice({
         state.error = action.payload;
       })
 
-      // Get All Bookings
       .addCase(getBookings.pending, (state) => {
         state.fetchStatus = "loading";
-        state.fetchError = null;
       })
       .addCase(getBookings.fulfilled, (state, action) => {
         state.fetchStatus = "succeeded";
@@ -167,54 +135,29 @@ const bookingSlice = createSlice({
         state.fetchError = action.payload;
       })
 
-      // Get Booking By ID
       .addCase(getBookingById.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        state.status = "loading";
       })
       .addCase(getBookingById.fulfilled, (state, action) => {
-        state.loading = false;
+        state.status = "succeeded";
         state.currentBooking = action.payload;
       })
       .addCase(getBookingById.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-
-      // Update Booking
-      .addCase(updateBooking.pending, (state) => {
-        state.updateStatus = "loading";
-        state.updateError = null;
-      })
-      .addCase(updateBooking.fulfilled, (state, action) => {
-        state.updateStatus = "succeeded";
-        const index = state.bookings.findIndex(
-          (booking) => booking._id === action.payload._id
-        );
-        if (index !== -1) {
-          state.bookings[index] = action.payload;
-        }
-        state.currentBooking = action.payload;
-      })
-      .addCase(updateBooking.rejected, (state, action) => {
-        state.updateStatus = "failed";
-        state.updateError = action.payload;
-      })
-
-      // Delete Booking
-      .addCase(deleteBooking.pending, (state) => {
-        state.status = "loading";
-        state.error = null;
-      })
-      .addCase(deleteBooking.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.bookings = state.bookings.filter(
-          (booking) => booking._id !== action.payload
-        );
-      })
-      .addCase(deleteBooking.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
+      })
+
+      .addCase(updateBooking.fulfilled, (state, action) => {
+        state.updateStatus = "succeeded";
+        const idx = state.bookings.findIndex(
+          (b) => b._id === action.payload._id
+        );
+        if (idx !== -1) state.bookings[idx] = action.payload;
+        state.currentBooking = action.payload;
+      })
+
+      .addCase(deleteBooking.fulfilled, (state, action) => {
+        state.bookings = state.bookings.filter((b) => b._id !== action.payload);
       });
   },
 });

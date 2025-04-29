@@ -3,7 +3,6 @@ import { Filter, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
 
-
 const userSidebarMenuItems = [
   {
     id: "flights",
@@ -43,7 +42,7 @@ const userSidebarMenuItems = [
   {
     id: "map",
     label: "map",
-    path: "/user/map",
+    path: "/travel/map",
   },
 ];
 
@@ -63,8 +62,6 @@ const MenuItems = ({ setOpen }) => {
           {menuItem.label}
         </div>
       ))}
-
-     
     </nav>
   );
 };

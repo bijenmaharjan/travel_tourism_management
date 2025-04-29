@@ -4,35 +4,53 @@ const http = require("http");
 const socketIO = require("socket.io");
 const path = require("path");
 const cors = require("cors");
+const passport = require("passport");
+// require("./config/passwort-config");
+const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const connectToDb = require("./DB/mongDB");
 
-// Initialize Express app
+// Initialize Express app and HTTP server
 const app = express();
-const server = http.createServer(app);
+const server = http.createServer(app); // important for Socket.IO
+
+// Initialize Socket.IO
+const io = socketIO(server, {
+  cors: {
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
 
 // Database connection
 connectToDb();
 
 // Configuration
-const PORT = process.env.PORT || 9000;
-const SOCKET_PORT = process.env.SOCKET_PORT || 3000;
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
+const PORT = process.env.PORT || 5000;
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 
 // Middleware
 app.use(
   cors({
     origin: FRONTEND_URL,
-    methods: ["GET", "POST", "DELETE", "PATCH", "PUT"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET", "POST", "DELETE", "PUT"],
+    allowedHeaders: [
+      "content-Type",
+      "Authorization",
+      "Cache-Control",
+      "Expires",
+      "Pragma",
+    ],
     credentials: true,
   })
 );
+
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-// View engine setup (for Socket.IO page)
+// View engine setup (for Socket.IO test page)
 app.set("view engine", "ejs");
 app.get("/travel/map", (req, res) => {
   try {
@@ -42,27 +60,41 @@ app.get("/travel/map", (req, res) => {
     res.status(500).send("Error rendering page");
   }
 });
-// Socket.IO setup
-const io = socketIO(server, {
-  cors: {
-    origin: FRONTEND_URL,
-    methods: ["GET", "POST"],
-  },
-});
+app.use(
+  session({ secret: "your_secret_key", resave: true, saveUninitialized: true })
+);
 
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Socket.IO event handling
 io.on("connection", (socket) => {
-  console.log("Connected user:", socket.id);
+  console.log("⚡ New client connected:", socket.id);
 
-  socket.on("send-location", (data) => {
-    console.log("Location received from", socket.id, data);
-    io.emit("receive-location", { id: socket.id, ...data });
+  socket.on("chat message", (msg) => {
+    console.log("Message received:", msg);
+    io.emit("chat message", msg); // Broadcast to all clients
   });
 
   socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
-    io.emit("user-disconnected", socket.id);
+    console.log("🚪 Client disconnected:", socket.id);
   });
 });
+// Redirect to Google login
+app.get(
+  "/auth/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+// Callback from Google
+app.get(
+  "/auth/google/callback",
+  passport.authenticate("google", { failureRedirect: "/" }),
+  (req, res) => {
+    // On success, redirect to your frontend or dashboard
+    res.redirect("http://localhost:5173"); // React frontend
+  }
+);
 
 // API Routes
 const apiRoutes = [
@@ -84,30 +116,17 @@ apiRoutes.forEach((route) => {
   app.use(route.path, route.router);
 });
 
-// Health check endpoint
-app.get("/health", (req, res) => {
-  res.status(200).json({ status: "healthy" });
-});
-
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: "Internal Server Error" });
 });
 
-// Start servers
-app.listen(PORT, (err) => {
+// Start server with Socket.IO support
+server.listen(PORT, (err) => {
   if (err) {
     console.error(`Main service failed to start: ${err}`);
   } else {
-    console.log(`Main service running on port ${PORT}`);
-  }
-});
-
-server.listen(SOCKET_PORT, (err) => {
-  if (err) {
-    console.error(`Socket.IO server failed to start: ${err}`);
-  } else {
-    console.log(`Socket.IO server running on port ${SOCKET_PORT}`);
+    console.log(`🚀 Server is running on port ${PORT}`);
   }
 });

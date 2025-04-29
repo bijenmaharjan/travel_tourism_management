@@ -10,7 +10,7 @@ const {
 
 const router = express.Router();
 
-// Validation rules
+// Validation middleware
 const validateBooking = [
   body("user").notEmpty().withMessage("User is required"),
   body("hotel").notEmpty().withMessage("Hotel is required"),
@@ -32,9 +32,8 @@ const validateBooking = [
     .withMessage("Invalid payment method"),
 ];
 
-// Routes
-router.post("/createbooking", validateBooking, createBooking);
-router.get("/getallbookings", getAllBookings);
+router.post("/create", validateBooking, createBooking);
+router.get("/", getAllBookings);
 router.get("/:id", getBookingById);
 router.put("/update/:id", validateBooking, updateBooking);
 router.delete("/delete/:id", deleteBooking);

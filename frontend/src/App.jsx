@@ -26,6 +26,7 @@ import TravelPackages from "./pages/user/TravelPackages";
 import HotelPackage from "./pages/user/HotelPackage";
 import AboutUs from "./pages/user/AboutUs";
 import ScrollToTop from "./components/user/ScrollToTop";
+import MapComponent from "./components/user/MapComponent";
 
 const App = () => {
   const { user, isAuthenticated, isLoading } = useSelector(
@@ -79,6 +80,7 @@ const App = () => {
           <Route path="travelPackage" element={<TravelPackages />} />
           <Route path="userhotel" element={<HotelPackage />} />
           <Route path="aboutus" element={<AboutUs />} />
+          <Route path="map" element={<MapComponent />} />
         </Route>
         <Route path="/unauth-page" element={<Unauthorized />} />
         <Route path="*" element={<Nopage />} />

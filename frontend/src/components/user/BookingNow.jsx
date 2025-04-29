@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import { FaCalendarAlt, FaUser, FaCreditCard, FaTimes } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { createBooking } from "../../store/booking";
+import { toast } from "react-toastify";
+import { Toaster } from "../ui/sonner";
 
-const BookNow = ({ hotel, onClose, onBookingSubmit }) => {
+const BookNow = ({ hotel, setShowBookingForm, onClose }) => {
   const [formData, setFormData] = useState({
     checkIn: "",
     checkOut: "",
@@ -19,6 +21,7 @@ const BookNow = ({ hotel, onClose, onBookingSubmit }) => {
   const dispatch = useDispatch();
   const { status, error } = useSelector((state) => state.booking);
   const { user } = useSelector((state) => state.auth);
+  // console.log("user1", user);
   const { hotelList } = useSelector((state) => state.adminHotel);
   console.log("hotelList", hotelList);
 
@@ -35,10 +38,10 @@ const BookNow = ({ hotel, onClose, onBookingSubmit }) => {
 
   useEffect(() => {
     if (status === "succeeded") {
-      onBookingSubmit?.();
-      onClose();
+      setShowBookingForm(true);
+      // onClose();
     }
-  }, [status, onBookingSubmit, onClose]);
+  }, [status, setShowBookingForm, onClose]);
 
   const handleBookingChange = (e) => {
     const { name, value } = e.target;
@@ -73,31 +76,46 @@ const BookNow = ({ hotel, onClose, onBookingSubmit }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!formData.checkIn || !formData.checkOut) {
-      alert("Please select both check-in and check-out dates");
-      return;
+    try {
+      if (!formData.checkIn || !formData.checkOut) {
+        alert("Please select both check-in and check-out dates");
+        return;
+      }
+
+      if (!user) {
+        alert("Please log in to book a hotel");
+        return;
+      }
+
+      const bookingPayload = {
+        ...formData,
+        hotel: hotel._id,
+        user: user.id,
+        roomsRequired: calculateRequiredRooms(),
+        nights: calculateNights(),
+        totalAmount: calculateTotal(),
+      };
+
+      dispatch(
+        createBooking({
+          bookingData: bookingPayload,
+          token: user.token,
+        })
+      )
+        .then((response) => {
+          console.log(response);
+          if (response) {
+            toast.success("Booked Hotel Successfully");
+            setShowBookingForm(false);
+          }
+        })
+        .catch((err) => {
+          // toast.error(response.payload.message);
+          console.log(err);
+        });
+    } catch (err) {
+      console.log(err);
     }
-
-    if (!user) {
-      alert("Please log in to book a hotel");
-      return;
-    }
-
-    const bookingPayload = {
-      ...formData,
-      hotel: hotel._id,
-      user: user.id,
-      roomsRequired: calculateRequiredRooms(),
-      nights: calculateNights(),
-      totalAmount: calculateTotal(),
-    };
-
-    dispatch(
-      createBooking({
-        bookingData: bookingPayload,
-        token: user.token,
-      })
-    );
   };
 
   return (
