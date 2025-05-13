@@ -21,7 +21,7 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const [bookingSidebarOpen, setBookingSidebarOpen] = useState(false);
- 
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -47,11 +47,7 @@ const Header = () => {
   return (
     <>
       <header
-        className={`fixed w-full top-0 z-50 transition-all duration-300 ${
-          isScrolled
-            ? "bg-white shadow-lg"
-            : "bg-gradient-to-r from-indigo-600 to-blue-500 shadow-xl"
-        }`}
+        className={`fixed w-full top-0 z-50 transition-all duration-300 `}
       >
         <div className="container mx-auto flex justify-between items-center p-2 px-4 sm:px-6 max-w-7xl">
           {/* Mobile Sidebar */}

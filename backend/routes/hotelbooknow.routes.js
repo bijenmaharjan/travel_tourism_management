@@ -6,6 +6,7 @@ const {
   getBookingById,
   deleteBooking,
   updateBooking,
+  getBookingsByUserId,
 } = require("../controllers/hotelbook.controller");
 
 const router = express.Router();
@@ -34,7 +35,7 @@ const validateBooking = [
 
 router.post("/create", validateBooking, createBooking);
 router.get("/", getAllBookings);
-router.get("/:id", getBookingById);
+router.get("/user/:userId", getBookingsByUserId);
 router.put("/update/:id", validateBooking, updateBooking);
 router.delete("/delete/:id", deleteBooking);
 

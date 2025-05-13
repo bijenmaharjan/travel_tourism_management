@@ -9,6 +9,7 @@ const passport = require("passport");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const connectToDb = require("./DB/mongDB");
+const esewaRoute = require("./routes/Esewa.routes");
 
 // Initialize Express app and HTTP server
 const app = express();
@@ -64,37 +65,19 @@ app.use(
   session({ secret: "your_secret_key", resave: true, saveUninitialized: true })
 );
 
-app.use(passport.initialize());
-app.use(passport.session());
-
 // Socket.IO event handling
-io.on("connection", (socket) => {
-  console.log("⚡ New client connected:", socket.id);
+// io.on("connection", (socket) => {
+//   console.log("⚡ New client connected:", socket.id);
 
-  socket.on("chat message", (msg) => {
-    console.log("Message received:", msg);
-    io.emit("chat message", msg); // Broadcast to all clients
-  });
+//   socket.on("chat message", (msg) => {
+//     console.log("Message received:", msg);
+//     io.emit("chat message", msg);
+//   });
 
-  socket.on("disconnect", () => {
-    console.log("🚪 Client disconnected:", socket.id);
-  });
-});
-// Redirect to Google login
-app.get(
-  "/auth/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
-
-// Callback from Google
-app.get(
-  "/auth/google/callback",
-  passport.authenticate("google", { failureRedirect: "/" }),
-  (req, res) => {
-    // On success, redirect to your frontend or dashboard
-    res.redirect("http://localhost:5173"); // React frontend
-  }
-);
+//   socket.on("disconnect", () => {
+//     console.log("🚪 Client disconnected:", socket.id);
+//   });
+// });
 
 // API Routes
 const apiRoutes = [
@@ -102,6 +85,7 @@ const apiRoutes = [
   { path: "/admin/api", router: require("./routes/hotel.routes") },
   { path: "/admin/api/image", router: require("./helpers/cloudinary") },
   { path: "/api/bookings", router: require("./routes/hotelbooknow.routes") },
+
   {
     path: "/api/v1/admin/travel-packages",
     router: require("./routes/admintravel.routes"),
@@ -115,6 +99,8 @@ const apiRoutes = [
 apiRoutes.forEach((route) => {
   app.use(route.path, route.router);
 });
+
+app.use("/esewa", esewaRoute);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

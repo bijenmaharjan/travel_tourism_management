@@ -1,4 +1,4 @@
-  import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllHotels } from "../../store/admin/admin";
 import { fetchTravelPackages } from "../../store/admin/admintravel";
@@ -119,7 +119,8 @@ const ImageSlideshow = ({ images }) => {
       <div className="relative w-full h-full">
         {isImageLoaded ? (
           <img
-            src={currentImage.image}
+            // src={currentImage.image}
+            src={placeholder1}
             alt={currentImage.alt}
             className="w-full h-full object-fill object-center"
           />
@@ -134,7 +135,7 @@ const ImageSlideshow = ({ images }) => {
             TRAVEL IS TO LIVE
           </h1>
           <p className="text-white text-xl sm:text-2xl md:text-3xl mb-8">
-            {currentImage.quote}
+            {/* {currentImage.quote} */}
           </p>
           <button className="bg-pink-300 text-gray-700 px-6 py-3 rounded-2xl animate-bounce text-lg sm:text-xl md:text-2xl">
             Start Travel
@@ -158,7 +159,7 @@ const ImageSlideshow = ({ images }) => {
       </button>
 
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-        {images.map((_, index) => (
+        {/* {images.map((_, index) => (
           <button
             key={index}
             onClick={() => goToSlide(index)}
@@ -167,7 +168,7 @@ const ImageSlideshow = ({ images }) => {
             }`}
             aria-label={`Go to slide ${index + 1}`}
           />
-        ))}
+        ))} */}
       </div>
     </div>
   );
@@ -190,7 +191,7 @@ const Home = () => {
   }, [dispatch]);
 
   return (
-    <div className="w-full bg-gray-50">
+    <div className="w-full ">
       <ScrollToTop />
       <ImageSlideshow images={slideshowImages} />
 

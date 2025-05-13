@@ -38,6 +38,37 @@ const AdminBookings = () => {
     dispatch(getBookings());
   }, [dispatch]);
 
+  useEffect(() => {
+    // This will run whenever bookings change
+    if (bookings && bookings.length > 0) {
+      const updatedBookings = bookings.map((booking) => {
+        if (booking?.hotel?._id) {
+          // Calculate new roomsAvailable (example: subtract roomsRequired)
+          const roomsAvailable =
+            (booking.hotel.roomsAvailable || 0) - (booking.roomsRequired || 0);
+          return {
+            ...booking,
+            hotel: {
+              ...booking.hotel,
+              roomsAvailable: roomsAvailable > 0 ? roomsAvailable : 0,
+            },
+          };
+        }
+        return booking;
+      });
+
+      updatedBookings.forEach((booking) => {
+        dispatch(
+          updateBooking({
+            id: booking._id,
+            bookingData: booking,
+            token: user.token,
+          })
+        );
+      });
+    }
+  }, [bookings, dispatch, user?.token]);
+
   // Filter bookings based on search and filter
   const filteredBookings = bookings.filter((booking) => {
     const matchesSearch =

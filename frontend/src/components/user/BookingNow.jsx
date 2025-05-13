@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { createBooking } from "../../store/booking";
 import { toast } from "react-toastify";
 import { Toaster } from "../ui/sonner";
+import EsewaPayment from "./EsewaPayment";
 
 const BookNow = ({ hotel, setShowBookingForm, onClose }) => {
   const [formData, setFormData] = useState({
@@ -21,15 +22,17 @@ const BookNow = ({ hotel, setShowBookingForm, onClose }) => {
   const dispatch = useDispatch();
   const { status, error } = useSelector((state) => state.booking);
   const { user } = useSelector((state) => state.auth);
-  // console.log("user1", user);
+  console.log("user1", user);
   const { hotelList } = useSelector((state) => state.adminHotel);
   console.log("hotelList", hotelList);
+  const [payment, setPayment] = useState(false);
+  console.log("payment", payment);
 
   useEffect(() => {
     if (user) {
       setFormData((prev) => ({
         ...prev,
-        name: user.name || "",
+        name: user.userName || "",
         email: user.email || "",
         phone: user.phone || "",
       }));
@@ -78,12 +81,16 @@ const BookNow = ({ hotel, setShowBookingForm, onClose }) => {
 
     try {
       if (!formData.checkIn || !formData.checkOut) {
-        alert("Please select both check-in and check-out dates");
+        toast.error("Please select both check-in and check-out dates");
+        return;
+      }
+      if (formData.checkIn === formData.checkOut) {
+        toast.error("Check-out date must be after the check-in date");
         return;
       }
 
       if (!user) {
-        alert("Please log in to book a hotel");
+        toast.error("Please log in to book a hotel");
         return;
       }
 
@@ -374,39 +381,38 @@ const BookNow = ({ hotel, setShowBookingForm, onClose }) => {
                 <div className="space-y-3">
                   <div className="flex items-center">
                     <input
-                      id="credit-card"
+                      id="esewapay"
+                      onClick={() => setPayment(false)}
                       name="paymentMethod"
                       type="radio"
-                      value="credit-card"
-                      checked={formData.paymentMethod === "credit-card"}
-                      onChange={handleBookingChange}
+                      value="pay-on-arrival"
+                      // onChange={handleBookingChange}
                       className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300"
                     />
                     <label
-                      htmlFor="credit-card"
+                      htmlFor="esewapay"
                       className="ml-3 block text-sm font-medium text-gray-700"
                     >
-                      <div className="flex items-center">
-                        <FaCreditCard className="mr-2 text-pink-500" />
-                        Credit/Debit Card
-                      </div>
+                      Pay on Arrival
                     </label>
                   </div>
                   <div className="flex items-center">
                     <input
-                      id="pay-on-arrival"
+                      id="esewa"
+                      onClick={() => setPayment(true)}
                       name="paymentMethod"
                       type="radio"
-                      value="pay-on-arrival"
-                      checked={formData.paymentMethod === "pay-on-arrival"}
-                      onChange={handleBookingChange}
+                      value="credit-card"
+                      // onChange={handleBookingChange}
                       className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300"
                     />
                     <label
-                      htmlFor="pay-on-arrival"
+                      htmlFor="esewa"
                       className="ml-3 block text-sm font-medium text-gray-700"
                     >
-                      Pay on Arrival
+                      <div className="flex  items-center">
+                        {payment ? <EsewaPayment /> : "Esewa Payment"}
+                      </div>
                     </label>
                   </div>
                 </div>
