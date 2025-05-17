@@ -104,7 +104,8 @@ const Header = () => {
             >
               Hotels
             </Link>
-            <Button
+            <Link
+              to="blog"
               onClick={scrollToTop}
               variant="ghost"
               className={`hover:bg-gradient-to-r hover:from-pink-500 hover:to-yellow-500 transition duration-300 px-4 py-2 rounded-lg text-sm xl:text-base ${
@@ -112,7 +113,7 @@ const Header = () => {
               }`}
             >
               Blog
-            </Button>
+            </Link>
             <Link
               onClick={scrollToTop}
               to="aboutus"

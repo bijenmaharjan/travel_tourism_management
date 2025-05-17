@@ -25,6 +25,7 @@ import ScrollToTop from "./components/user/ScrollToTop";
 import MapComponent from "./components/user/MapComponent";
 import PaymentSuccess from "./components/user/PaymentSuccess"; // Add this import
 import PaymentFailure from "./components/user/PaymentFailure"; // Add this import
+import Blog from "./pages/user/Blog";
 
 const App = () => {
   const { user, isAuthenticated, isLoading } = useSelector(
@@ -82,6 +83,7 @@ const App = () => {
           <Route path="userhotel" element={<HotelPackage />} />
           <Route path="aboutus" element={<AboutUs />} />
           <Route path="map" element={<MapComponent />} />
+          <Route path="blog" element={<Blog />} />
         </Route>
 
         {/* Other routes */}
