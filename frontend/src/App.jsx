@@ -26,6 +26,8 @@ import MapComponent from "./components/user/MapComponent";
 import PaymentSuccess from "./components/user/PaymentSuccess"; // Add this import
 import PaymentFailure from "./components/user/PaymentFailure"; // Add this import
 import Blog from "./pages/user/Blog";
+import Logins from "./auth/Logins";
+import Contact from "./pages/user/Contact";
 
 const App = () => {
   const { user, isAuthenticated, isLoading } = useSelector(
@@ -46,7 +48,7 @@ const App = () => {
       <Routes>
         {/* Public routes */}
         <Route path="/auth">
-          <Route path="login" element={<Login />} />
+          <Route path="login" element={<Logins />} />
           <Route path="register" element={<Register />} />
         </Route>
 
@@ -81,7 +83,11 @@ const App = () => {
           <Route path="home" element={<Home />} />
           <Route path="travelPackage" element={<TravelPackages />} />
           <Route path="userhotel" element={<HotelPackage />} />
+          
+          
           <Route path="aboutus" element={<AboutUs />} />
+          <Route path="contact" element={<Contact />} />
+
           <Route path="map" element={<MapComponent />} />
           <Route path="blog" element={<Blog />} />
         </Route>

@@ -10,6 +10,7 @@ const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const connectToDb = require("./DB/mongDB");
 const esewaRoute = require("./routes/Esewa.routes");
+const searchRoutes = require("./routes/search.routes");
 
 // Initialize Express app and HTTP server
 const app = express();
@@ -107,6 +108,7 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: "Internal Server Error" });
 });
+app.use("/api/search", searchRoutes);
 
 // Start server with Socket.IO support
 server.listen(PORT, (err) => {

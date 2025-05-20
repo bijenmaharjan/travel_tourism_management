@@ -29,7 +29,7 @@ const PackageCard = ({ hotel, onSelectHotel }) => {
 
   return (
     <div
-      className="w-full bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex flex-col cursor-pointer"
+      className="w-full bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex flex-col cursor-pointer "
       onClick={() => onSelectHotel(hotel)}
     >
       {/* Image Section */}
