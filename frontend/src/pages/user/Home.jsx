@@ -131,7 +131,7 @@ const Home = () => {
               <PackageCardTour
                 key={pkg.id || pkg._id}
                 package={pkg}
-                onClick={() => setSelectedPackage(pkg)} // Add this line
+                onClick={() => setSelectedPackage(pkg)} 
               />
             ))
           ) : (

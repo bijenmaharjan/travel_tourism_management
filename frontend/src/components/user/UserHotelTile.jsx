@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import PackageCard from "./PackageCard";
+import PackageCard from "./HotelPackageCard";
 import UserViewDetails from "./UserViewDetails";
 
 const UserHotelTile = ({

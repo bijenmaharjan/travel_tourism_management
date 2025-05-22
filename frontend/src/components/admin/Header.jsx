@@ -1,18 +1,29 @@
 import React from "react";
-import { Menu } from "lucide-react";
+import { Menu, LogOut } from "lucide-react";
 import { Button } from "../UI/button";
-import { LogOut } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../../store/auth";
+import axios from "axios";
 
 const AdminHeader = ({ setOpen }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const handleLogout = () => {
-    dispatch(logoutUser());
-    
+  const handleLogout = async () => {
+    try {
+      await axios.post(
+        "http://localhost:9000/auth/user/api/logout",
+        {},
+        { withCredentials: true }
+      );
+      dispatch(logoutUser());
+      navigate("/auth/login");
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
   };
+
   return (
     <header className="flex items-center justify-between px-4 border-b py-3 bg-slate-50">
       <Button className="lg:hidden sm:block" onClick={() => setOpen(true)}>

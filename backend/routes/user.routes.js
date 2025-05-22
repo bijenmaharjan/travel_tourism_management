@@ -42,6 +42,6 @@ router.get("/check-auth", userController.authMiddleware, (req, res) => {
   res.status(200).json({ success: true, message: "Authenticated", user });
 });
 
-router.post("/logout", userController.logoutUser);
 
+router.post("/logout", userController.logoutUser);
 module.exports = router;

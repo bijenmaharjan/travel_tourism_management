@@ -18,11 +18,7 @@ const Register = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    // Clear error when typing
+    setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -44,7 +40,6 @@ const Register = () => {
 
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) return;
 
     const newUser = {
@@ -59,148 +54,82 @@ const Register = () => {
 
     try {
       const resultAction = await dispatch(registerUser(newUser));
-
       if (registerUser.fulfilled.match(resultAction)) {
         toast.success("Registration successful!");
         navigate("/auth/login");
       } else {
         const error = resultAction.payload;
         toast.error(error?.message || "Registration failed");
-
-        // Set field-specific errors if available
-        if (error?.details) {
-          setErrors(error.details);
-        }
+        if (error?.details) setErrors(error.details);
       }
-    } catch (err) {
+    } catch {
       toast.error("An unexpected error occurred");
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen w-full bg-blue-300 p-4">
-      <div className="bg-white w-full max-w-screen-md lg:max-w-2xl rounded-2xl shadow-lg flex md:flex-row">
-        {/* Left Side - Image */}
-        <div className="w-full md:w-1/2 block max-[770px]:hidden">
-          <img
-            src="https://s3-alpha-sig.figma.com/img/cdfd/c551/f9c6d619820566f61a6c7f8d4d236ae0?Expires=1743379200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=ijmrp2JWfIXbn7jHpWJrH6KlsGXqcuPPvnyT7-rQW4s5c0VJsTFHA2bOeth-N-lScw5qVjfSvvmQKuEZqZbp82UJbGxxwI9cInc-qkbtrLgyxfZWwAigWIoOOLXI4wy2OWMS9~WBC4-P84KPOjXbDOwQhxw0r9YmZUHH0NtzXeOfhE761hd8zXgCANKaHDyoL-yEFq8ubTb7REm4JRth3zGunQldr3h9MvOz5z5JmVEMXrcvRvVxm9tio1fW76c26NannyLZ5AP4U3aHjSkrS-rqxcflzjj7n2UQmD1mRQhoCd6bhXycNyWmTalJ4nSoroksc6kqRYMYEHKNS6XVTQ__"
-            alt="Register Image"
-            className="object-center object-cover w-full h-[300px] md:h-[440px] rounded-t-2xl md:rounded-l-2xl md:rounded-tr-none"
-          />
-        </div>
+    <div className="flex w-full h-screen">
+      {/* Left - Image */}
+      <div className="w-[50%] hidden md:block">
+        <img
+          className="object-cover w-full h-full"
+          src="https://scontent.fktm3-1.fna.fbcdn.net/v/t1.15752-9/494327528_580974298366909_7866041604739773220_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=0024fc&_nc_ohc=_HWekiHfNywQ7kNvwFmQVKX&_nc_oc=AdkRxJE94agWTPUbGw2FS6ej0X32kLZ_9o8lhrax9DS9SDv7k_f54-UtLmuybtEH7yQU8XiuYedoIr7e6fPIvkvX&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent.fktm3-1.fna&oh=03_Q7cD2QGQYS7HxwIXJj6xC8j9Y7fWQOdsR-ITQOUmLKoIqMHwng&oe=6851575F"
+          alt="Register Visual"
+        />
+      </div>
 
-        {/* Right Side - Form */}
-        <div className="w-full md:w-1/2 flex flex-col items-center p-6">
-          <div className="w-full max-w-sm text-center">
-            <h2 className="text-2xl text-blue-700 font-semibold">
-              Create Account
-            </h2>
-            <h6 className="mt-2 text-gray-500">Register to get started</h6>
+      {/* Right - Form */}
+      <div className="w-full md:w-[50%] flex flex-col justify-center items-center px-6 py-10">
+        <div className="w-full max-w-md">
+          <h2 className="text-3xl font-bold text-blue-700 mb-2">
+            Create Account
+          </h2>
+          <p className="text-gray-500 mb-6">Register to get started</p>
 
-            <form
-              onSubmit={handleRegisterSubmit}
-              className="mt-8 flex flex-col items-center gap-4 w-full"
-            >
-              <div className="w-full">
+          <form onSubmit={handleRegisterSubmit} className="space-y-4">
+            {[
+              { name: "username", placeholder: "Username" },
+              { name: "firstname", placeholder: "First Name" },
+              { name: "lastname", placeholder: "Last Name" },
+              { name: "email", placeholder: "Email", type: "email" },
+              { name: "password", placeholder: "Password", type: "password" },
+            ].map((field) => (
+              <div key={field.name}>
                 <input
-                  className={`border-2 w-full p-2 ${
-                    errors.username ? "border-red-500" : "border-blue-400"
-                  } rounded-md`}
-                  type="text"
-                  name="username"
-                  value={formData.username}
+                  className={`w-full border-2 p-2 rounded-md focus:outline-none ${
+                    errors[field.name] ? "border-red-500" : "border-blue-400"
+                  }`}
+                  type={field.type || "text"}
+                  name={field.name}
+                  value={formData[field.name]}
                   onChange={handleInputChange}
-                  placeholder="Username"
+                  placeholder={field.placeholder}
                 />
-                {errors.username && (
-                  <p className="text-sm text-red-500 mt-1">{errors.username}</p>
-                )}
-              </div>
-
-              <div className="w-full">
-                <input
-                  className={`border-2 w-full p-2 ${
-                    errors.firstname ? "border-red-500" : "border-blue-400"
-                  } rounded-md`}
-                  type="text"
-                  name="firstname"
-                  value={formData.firstname}
-                  onChange={handleInputChange}
-                  placeholder="First name"
-                />
-                {errors.firstname && (
+                {errors[field.name] && (
                   <p className="text-sm text-red-500 mt-1">
-                    {errors.firstname}
+                    {errors[field.name]}
                   </p>
                 )}
               </div>
+            ))}
 
-              <div className="w-full">
-                <input
-                  className={`border-2 w-full p-2 ${
-                    errors.lastname ? "border-red-500" : "border-blue-400"
-                  } rounded-md`}
-                  type="text"
-                  name="lastname"
-                  value={formData.lastname}
-                  onChange={handleInputChange}
-                  placeholder="Last name"
-                />
-                {errors.lastname && (
-                  <p className="text-sm text-red-500 mt-1">{errors.lastname}</p>
-                )}
-              </div>
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
+            >
+              Register
+            </button>
+          </form>
 
-              <div className="w-full">
-                <input
-                  className={`border-2 w-full p-2 ${
-                    errors.email ? "border-red-500" : "border-blue-400"
-                  } rounded-md`}
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  placeholder="Email"
-                />
-                {errors.email && (
-                  <p className="text-sm text-red-500 mt-1">{errors.email}</p>
-                )}
-              </div>
-
-              <div className="w-full">
-                <input
-                  className={`border-2 w-full p-2 ${
-                    errors.password ? "border-red-500" : "border-blue-400"
-                  } rounded-md`}
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  placeholder="Password"
-                />
-                {errors.password && (
-                  <p className="text-sm text-red-500 mt-1">{errors.password}</p>
-                )}
-              </div>
-
-              <button
-                type="submit"
-                className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition"
-              >
-                Register
-              </button>
-            </form>
-
-            <p className="mt-5">
-              Already have an account?{" "}
-              <Link
-                to="/auth/login"
-                className="font-semibold text-blue-600 hover:text-blue-800"
-              >
-                Login
-              </Link>
-            </p>
-          </div>
+          <p className="mt-5 text-sm text-center">
+            Already have an account?{" "}
+            <Link
+              to="/auth/login"
+              className="text-blue-600 hover:underline font-medium"
+            >
+              Login
+            </Link>
+          </p>
         </div>
       </div>
     </div>

@@ -3,6 +3,7 @@ import authSlice from "./auth";
 import adminHotelSlice from "./admin/admin";
 import bookingSlice from "./booking";
 import travelPackageSlice from "../store/admin/admintravel";
+import tourbookingSlice from "../store/tourBooking";
 
 const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ const store = configureStore({
     adminHotel: adminHotelSlice,
     booking: bookingSlice,
     travelPackage: travelPackageSlice, // Now correctly referencing the imported slice
+    tourBooking: tourbookingSlice,
   },
 });
 

@@ -1,114 +1,92 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   FaSearch,
   FaFilter,
   FaUser,
-  FaHotel,
   FaCalendarAlt,
-  FaMoneyBillWave,
-  FaPhone,
-  FaEnvelope,
-  FaCreditCard,
-  FaCashRegister,
+  FaClock,
   FaCheckCircle,
   FaTimesCircle,
-  FaClock,
   FaBed,
 } from "react-icons/fa";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
-import { deleteBooking, getBookings, updateBooking } from "../../store/booking";
+
+import {
+  getBookings as fetchHotelBookings,
+  deleteBooking as deleteHotelBooking,
+  updateBooking,
+} from "../../store/booking";
+
+import { getTourBookings, deleteTourBooking } from "../../store/tourBooking";
+
 import EditBookingDialog from "../../components/admin/EditBookingDialog";
 
 const AdminBookings = () => {
   const dispatch = useDispatch();
+  const hotelBookings = useSelector((state) => state.booking.bookings) || [];
+  const tourBookings = useSelector((state) => state.tourBooking.bookings) || [];
+  const loading =
+    useSelector((state) => state.booking.loading) ||
+    useSelector((state) => state.tourBooking.loading);
+  const error =
+    useSelector((state) => state.booking.error) ||
+    useSelector((state) => state.tourBooking.error);
+  const user = useSelector((state) => state.auth.user);
 
-  // Get bookings from Redux store
-  const { bookings, loading, error } = useSelector((state) => state.booking);
-  const { user } = useSelector((state) => state.auth);
-
-  console.log("bookings", bookings);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [currentBooking, setCurrentBooking] = useState(null);
 
-  // Fetch bookings when component mounts
   useEffect(() => {
-    dispatch(getBookings());
+    dispatch(fetchHotelBookings());
+    dispatch(getTourBookings());
   }, [dispatch]);
 
-  useEffect(() => {
-    // This will run whenever bookings change
-    if (bookings && bookings.length > 0) {
-      const updatedBookings = bookings.map((booking) => {
-        if (booking?.hotel?._id) {
-          // Calculate new roomsAvailable (example: subtract roomsRequired)
-          const roomsAvailable =
-            (booking.hotel.roomsAvailable || 0) - (booking.roomsRequired || 0);
-          return {
-            ...booking,
-            hotel: {
-              ...booking.hotel,
-              roomsAvailable: roomsAvailable > 0 ? roomsAvailable : 0,
-            },
-          };
-        }
-        return booking;
-      });
+  const allBookings = [...hotelBookings, ...tourBookings];
 
-      updatedBookings.forEach((booking) => {
-        dispatch(
-          updateBooking({
-            id: booking._id,
-            bookingData: booking,
-            token: user.token,
-          })
-        );
-      });
-    }
-  }, [bookings, dispatch, user?.token]);
-
-  // Filter bookings based on search and filter
-  const filteredBookings = bookings.filter((booking) => {
+  const filteredBookings = allBookings.filter((booking) => {
+    const search = searchTerm.trim().toLowerCase();
+    const name = booking?.name?.toLowerCase() || "";
+    const email = booking?.email?.toLowerCase() || "";
+    const hotelName = booking?.hotel?.name?.toLowerCase() || "";
+    const tourName = booking?.tour?.name?.toLowerCase() || "";
     const matchesSearch =
-      booking.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (booking.hotel &&
-        booking.hotel.name.toLowerCase().includes(searchTerm.toLowerCase()));
-
+      !search ||
+      name.includes(search) ||
+      email.includes(search) ||
+      hotelName.includes(search) ||
+      tourName.includes(search);
     const matchesFilter =
       filterStatus === "all" || booking.status === filterStatus;
-
     return matchesSearch && matchesFilter;
   });
 
-  // Format date for display
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
-    const options = { year: "numeric", month: "short", day: "numeric" };
-    return new Date(dateString).toLocaleDateString(undefined, options);
+    return new Date(dateString).toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
   };
 
-  // Handle booking status change
-  const handleStatusChange = (id, newStatus) => {
-    dispatch(updateBookingStatus(id, newStatus));
-  };
-
-  // Handle booking deletion
-  const handleDelete = (id) => {
+  const handleDelete = (booking) => {
     if (window.confirm("Are you sure you want to delete this booking?")) {
-      dispatch(deleteBooking({ id, token: user.token }));
+      const deleteAction = booking.hotel
+        ? deleteHotelBooking
+        : deleteTourBooking;
+      dispatch(deleteAction({ id: booking._id, token: user.token }));
     }
   };
 
   const handleEdit = (id) => {
-    const bookingToEdit = bookings.find((b) => b._id === id);
-    setCurrentBooking(bookingToEdit);
+    const selected = allBookings.find((b) => b._id === id);
+    setCurrentBooking(selected);
     setIsEditDialogOpen(true);
   };
 
-  // Add this function to handle saving:
   const handleSaveBooking = async (updatedBooking) => {
     try {
       await dispatch(
@@ -119,30 +97,25 @@ const AdminBookings = () => {
         })
       );
       setIsEditDialogOpen(false);
-      // Optionally refresh bookings
-      dispatch(getBookings());
-    } catch (error) {
-      console.error("Error updating booking:", error);
+      dispatch(fetchHotelBookings());
+      dispatch(getTourBookings());
+    } catch (err) {
+      console.error("Update failed:", err);
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-3 text-gray-700">Loading bookings...</p>
-        </div>
+      <div className="min-h-screen flex justify-center items-center">
+        <p className="text-gray-600">Loading bookings...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
-        <div className="text-center text-red-500">
-          <p>Error loading bookings: {error}</p>
-        </div>
+      <div className="min-h-screen flex justify-center items-center">
+        <p className="text-red-500">Error: {error}</p>
       </div>
     );
   }
@@ -150,37 +123,27 @@ const AdminBookings = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">
-            Booking Management
-          </h1>
-          <p className="text-gray-600">View and manage all hotel bookings</p>
-        </div>
-
-        {/* Search and Filter Bar */}
-        <div className="bg-white rounded-lg shadow p-4 mb-6 flex flex-col md:flex-row gap-4">
+        <h1 className="text-3xl font-bold mb-6">Booking Management</h1>
+        <div className="flex flex-col md:flex-row gap-4 bg-white p-4 rounded shadow mb-8">
           <div className="relative flex-grow">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <FaSearch className="text-gray-400" />
-            </div>
+            <FaSearch className="absolute top-2.5 left-3 text-gray-400" />
             <input
               type="text"
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              placeholder="Search bookings by name, email or hotel"
+              placeholder="Search bookings..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 py-2 border rounded focus:ring-2 focus:ring-blue-500"
+              autoComplete="off"
             />
           </div>
-
-          <div className="flex items-center gap-2">
-            <FaFilter className="text-gray-500" />
+          <div className="flex items-center">
+            <FaFilter className="text-gray-500 mr-2" />
             <select
-              className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
+              className="py-2 px-3 border rounded focus:ring-2 focus:ring-blue-500"
             >
-              <option value="all">All Statuses</option>
+              <option value="all">All</option>
               <option value="pending">Pending</option>
               <option value="confirmed">Confirmed</option>
               <option value="cancelled">Cancelled</option>
@@ -188,190 +151,98 @@ const AdminBookings = () => {
             </select>
           </div>
         </div>
-
-        {/* Bookings Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {filteredBookings.map((booking) => (
-            <div
-              key={booking._id}
-              className="bg-white rounded-lg shadow overflow-hidden"
-            >
-              {/* Booking Header */}
-              <div
-                className={`px-4 py-3 flex justify-between items-center ${
-                  booking.status === "confirmed"
-                    ? "bg-green-50"
-                    : booking.status === "pending"
-                    ? "bg-yellow-50"
-                    : booking.status === "cancelled"
-                    ? "bg-red-50"
-                    : "bg-blue-50"
-                }`}
-              >
-                <div className="flex items-center">
-                  {booking.status === "confirmed" && (
-                    <FaCheckCircle className="text-green-500 mr-2" />
-                  )}
-                  {booking.status === "pending" && (
-                    <FaClock className="text-yellow-500 mr-2" />
-                  )}
-                  {booking.status === "cancelled" && (
-                    <FaTimesCircle className="text-red-500 mr-2" />
-                  )}
-                  <span className="font-medium capitalize">
+          {filteredBookings.length === 0 ? (
+            <p className="text-center text-gray-500 col-span-full">
+              No bookings found.
+            </p>
+          ) : (
+            filteredBookings.map((booking) => (
+              <div key={booking._id} className="bg-white rounded shadow p-4">
+                <div
+                  className={`flex justify-between items-center p-2 rounded-t text-sm font-medium capitalize ${
+                    booking.status === "confirmed"
+                      ? "bg-green-100 text-green-800"
+                      : booking.status === "pending"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : booking.status === "cancelled"
+                      ? "bg-red-100 text-red-800"
+                      : "bg-blue-100 text-blue-800"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    {booking.status === "confirmed" && <FaCheckCircle />}
+                    {booking.status === "pending" && <FaClock />}
+                    {booking.status === "cancelled" && <FaTimesCircle />}
                     {booking.status}
-                  </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleEdit(booking._id)}
+                      className="text-blue-600 hover:text-blue-800"
+                      aria-label="Edit Booking"
+                    >
+                      <FiEdit />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(booking)}
+                      className="text-red-600 hover:text-red-800"
+                      aria-label="Delete Booking"
+                    >
+                      <FiTrash2 />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => handleEdit(booking._id)}
-                    className="text-blue-600 hover:text-blue-800"
-                  >
-                    <FiEdit />
-                  </button>
-                  <button
-                    className="text-red-600 hover:text-red-800"
-                    onClick={() => handleDelete(booking._id)}
-                  >
-                    <FiTrash2 />
-                  </button>
-                </div>
-              </div>
-
-              {/* Booking Details */}
-              <div className="p-4">
-                <div className="mb-4">
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    {booking.hotel?.name || "Unknown Hotel"}
+                <div className="mt-3">
+                  <h3 className="text-lg font-bold">
+                    {booking.hotel?.name ||
+                      booking.tour?.name ||
+                      "Tour Package"}
                   </h3>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-sm text-gray-600">
                     Booking ID: {booking._id}
                   </p>
                 </div>
-
-                <div className="space-y-3">
-                  {/* Guest Info */}
-                  <div className="flex items-start">
-                    <FaUser className="mt-1 mr-3 text-blue-500" />
+                <div className="mt-2 space-y-2 text-sm text-gray-700">
+                  <div className="flex items-start gap-2">
+                    <FaUser className="mt-1 text-blue-500" />
                     <div>
                       <p className="font-medium">{booking.name}</p>
-                      <p className="text-sm text-gray-600">{booking.email}</p>
-                      <p className="text-sm text-gray-600">{booking.phone}</p>
+                      <p>{booking.email}</p>
+                      <p>{booking.phone}</p>
                     </div>
                   </div>
-
-                  {/* Dates */}
-                  <div className="flex items-start">
-                    <FaCalendarAlt className="mt-1 mr-3 text-blue-500" />
+                  <div className="flex items-start gap-2">
+                    <FaCalendarAlt className="mt-1 text-blue-500" />
                     <div>
-                      <p className="text-sm">
+                      <p>
                         <span className="font-medium">Check-in:</span>{" "}
                         {formatDate(booking.checkIn)}
                       </p>
-                      <p className="text-sm">
+                      <p>
                         <span className="font-medium">Check-out:</span>{" "}
                         {formatDate(booking.checkOut)}
                       </p>
-                      <p className="text-sm">
+                      <p>
                         <span className="font-medium">Nights:</span>{" "}
-                        {booking.nights}
+                        {booking.nights || "N/A"}
                       </p>
                     </div>
                   </div>
-
-                  {/* Room Details */}
-                  <div className="flex items-start">
-                    <FaBed className="mt-1 mr-3 text-blue-500" />
-                    <div>
-                      <p className="text-sm">
-                        <span className="font-medium">Rooms:</span>{" "}
-                        {booking.roomsRequired}
-                      </p>
-                      <p className="text-sm">
-                        <span className="font-medium">Guests:</span>{" "}
-                        {booking.adults} adults, {booking.children} children
-                      </p>
-                    </div>
+                  <div className="flex items-start gap-2">
+                    <FaBed className="mt-1 text-blue-500" />
+                    <p>
+                      <span className="font-medium">Rooms:</span>{" "}
+                      {booking.roomsRequired || "N/A"}
+                    </p>
                   </div>
-
-                  {/* Payment */}
-                  <div className="flex items-start">
-                    <FaMoneyBillWave className="mt-1 mr-3 text-blue-500" />
-                    <div>
-                      <p className="text-sm">
-                        <span className="font-medium">Total:</span> NPR{" "}
-                        {booking.totalAmount}
-                      </p>
-                      <p className="text-sm flex items-center">
-                        <span className="font-medium">Payment:</span>
-                        {booking.paymentMethod === "credit-card" ? (
-                          <>
-                            <FaCreditCard className="ml-1 mr-1 text-green-500" />{" "}
-                            Credit Card
-                          </>
-                        ) : (
-                          <>
-                            <FaCashRegister className="ml-1 mr-1 text-purple-500" />{" "}
-                            On Arrival
-                          </>
-                        )}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Special Requests */}
-                  {booking.specialRequests && (
-                    <div className="mt-3 pt-3 border-t border-gray-200">
-                      <p className="text-sm font-medium text-gray-700">
-                        Special Requests:
-                      </p>
-                      <p className="text-sm text-gray-600 italic">
-                        {booking.specialRequests}
-                      </p>
-                    </div>
-                  )}
                 </div>
               </div>
-
-              {/* Action Buttons */}
-              <div className="px-4 py-3 bg-gray-50 flex justify-between">
-                <select
-                  className="text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  value={booking.status}
-                  onChange={(e) =>
-                    handleStatusChange(booking._id, e.target.value)
-                  }
-                >
-                  <option value="pending">Pending</option>
-                  <option value="confirmed">Confirmed</option>
-                  <option value="cancelled">Cancelled</option>
-                  <option value="completed">Completed</option>
-                </select>
-                <button className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded">
-                  View Details
-                </button>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
-
-        {/* Empty State */}
-        {filteredBookings.length === 0 && !loading && (
-          <div className="text-center py-12">
-            <div className="mx-auto h-24 w-24 text-gray-400">
-              <FaHotel className="w-full h-full" />
-            </div>
-            <h3 className="mt-2 text-lg font-medium text-gray-900">
-              No bookings found
-            </h3>
-            <p className="mt-1 text-sm text-gray-500">
-              Try adjusting your search or filter to find what you're looking
-              for.
-            </p>
-          </div>
-        )}
       </div>
-      {isEditDialogOpen && (
+      {isEditDialogOpen && currentBooking && (
         <EditBookingDialog
           booking={currentBooking}
           onClose={() => setIsEditDialogOpen(false)}

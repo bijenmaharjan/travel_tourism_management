@@ -9,6 +9,7 @@ const Logins = () => {
     email: "",
     password: "",
   });
+  console.log("data", formData);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
@@ -47,6 +48,10 @@ const Logins = () => {
         loginUser({
           email: formData.email,
           password: formData.password,
+          // }).then((response) => {
+          //   if (response) {
+          //     localStorage.setItem(response?.user?.token);
+          //   }
         })
       );
 

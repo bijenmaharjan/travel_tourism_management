@@ -402,3 +402,5 @@ const UserViewDetails = ({ hotel, onClose }) => {
 };
 
 export default UserViewDetails;
+
+

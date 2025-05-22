@@ -3,12 +3,12 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
-// Fix for default icon issues
+// Leaflet default icon fix
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
-// Patch Leaflet icons
+// Configure Leaflet icons
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: markerIcon2x,
@@ -27,22 +27,22 @@ export default function MapView() {
           setPosition([latitude, longitude]);
         },
         (err) => {
-          console.error("Error getting location:", err);
+          console.error("Geolocation error:", err);
+          // Fallback location (Kathmandu)
+          setPosition([27.7172, 85.324]);
         }
       );
     } else {
       console.error("Geolocation is not supported by this browser.");
+      // Fallback location
+      setPosition([27.7172, 85.324]);
     }
   }, []);
 
   return (
-    <div className="overflow-hidden absolute -z-50" style={{ height: "700px", width: "100%" }}>
-      {position && (
-        <MapContainer
-          center={position}
-          zoom={13}
-          style={{ height: "100%", width: "100%" }}
-        >
+    <div className="relative w-full h-[700px]">
+      {position ? (
+        <MapContainer center={position} zoom={13} className="w-full h-full">
           <TileLayer
             attribution="&copy; OpenStreetMap contributors"
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -51,8 +51,11 @@ export default function MapView() {
             <Popup>You are here!</Popup>
           </Marker>
         </MapContainer>
+      ) : (
+        <div className="flex items-center justify-center h-full">
+          <p className="text-gray-500">Loading map...</p>
+        </div>
       )}
-      {!position && <p>Loading map...</p>}
     </div>
   );
 }

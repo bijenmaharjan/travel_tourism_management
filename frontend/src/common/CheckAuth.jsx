@@ -1,49 +1,25 @@
-import { Navigate, useLocation } from "react-router-dom";
+import React from "react";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 
-function CheckAuth({ isAuthenticated, user, children }) {
+function CheckAuth({ isAuthenticated, user }) {
   const location = useLocation();
 
-  console.log(location.pathname, isAuthenticated);
-  console.log("userrole", user?.role);
+  const isLoginOrRegister =
+    location.pathname.includes("/login") ||
+    location.pathname.includes("/register");
 
-  if (location.pathname === "/") {
-    if (!isAuthenticated) {
-      return <Navigate to="/auth/login" />;
-    } else {
-      if (user?.role === "admin") {
-        return <Navigate to="/admin/dashboard" />;
-      } else {
-        return <Navigate to="/shop/home" />;
-      }
-    }
-  }
-
-  if (
-    !isAuthenticated &&
-    !(
-      location.pathname.includes("/login") ||
-      location.pathname.includes("/register")
-    )
-  ) {
+  if (!isAuthenticated && !isLoginOrRegister) {
     return <Navigate to="/auth/login" />;
   }
 
-  if (
-    isAuthenticated &&
-    (location.pathname.includes("/login") ||
-      location.pathname.includes("/register"))
-  ) {
-    if (user?.role === "admin") {
-      return <Navigate to="/admin/dashboard" />;
-    } else {
-      return <Navigate to="/shop/home" />;
-    }
+  if (isAuthenticated && isLoginOrRegister) {
+    return <Navigate to={user?.role === "admin/" ? "/admin" : "/travel/home"} />;
   }
 
   if (
     isAuthenticated &&
     user?.role !== "admin" &&
-    location.pathname.includes("admin")
+    location.pathname.includes("/admin")
   ) {
     return <Navigate to="/unauth-page" />;
   }
@@ -51,12 +27,12 @@ function CheckAuth({ isAuthenticated, user, children }) {
   if (
     isAuthenticated &&
     user?.role === "admin" &&
-    location.pathname.includes("shop")
+    location.pathname.includes("/travel")
   ) {
-    return <Navigate to="/admin/dashboard" />;
+    return <Navigate to="/admin" />;
   }
 
-  return <>{children}</>;
+  return <Outlet />;
 }
 
 export default CheckAuth;

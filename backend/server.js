@@ -86,6 +86,10 @@ const apiRoutes = [
   { path: "/admin/api", router: require("./routes/hotel.routes") },
   { path: "/admin/api/image", router: require("./helpers/cloudinary") },
   { path: "/api/bookings", router: require("./routes/hotelbooknow.routes") },
+  {
+    path: "/api/tourbookings",
+    router: require("./routes/travelbooknow.routes"),
+  },
 
   {
     path: "/api/v1/admin/travel-packages",

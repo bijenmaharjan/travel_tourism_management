@@ -8,6 +8,15 @@ const TravelPackages = () => {
   );
 
   console.log("package", packages);
+
+  if (isLoading) {
+    return <div className="text-center p-10">Loading packages...</div>;
+  }
+
+  if (!packages.length) {
+    return <div className="text-center p-10">No packages available yet.</div>;
+  }
+
   return (
     <div>
       <PackageGrid packages={packages} />

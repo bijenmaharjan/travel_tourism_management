@@ -11,7 +11,7 @@ import {
 const PackageCard = ({ hotel, onSelectHotel }) => {
   console.log("PackageCard", hotel);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
+  
   const handleImageNavigation = (direction) => (e) => {
     e.stopPropagation();
     setCurrentImageIndex((prev) =>

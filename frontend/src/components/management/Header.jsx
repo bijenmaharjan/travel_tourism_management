@@ -46,6 +46,20 @@ const Header = () => {
     };
   }, []);
 
+  const handleLogout = async () => {
+    try {
+      await axios.post(
+        "http://localhost:9000/auth/user/api/logout",
+        {},
+        { withCredentials: true }
+      );
+      dispatch(logoutUser());
+      navigate("/auth/login");
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -84,7 +98,6 @@ const Header = () => {
     }
   };
 
-  const handleLogoutUser = () => dispatch(logoutUser());
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
   const handleBookingSidebarToggle = () =>
     setBookingSidebarOpen(!bookingSidebarOpen);
@@ -215,15 +228,11 @@ const Header = () => {
               </button>
 
               {profileOpen && (
-                <div className="absolute right-0 mt-2 bg-white shadow-xl border border-gray-300 rounded-lg w-48 z-50">
-                  <button className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300 rounded-md">
-                    Sign In
-                  </button>
-                  <button className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300 rounded-md">
-                    Profile
-                  </button>
+                <div className="absolute   mt-3 bg-white shadow-xl border border-gray-300 rounded-lg w-40 self-center z-50">
+                
+
                   <button
-                    onClick={handleLogoutUser}
+                    onClick={handleLogout}
                     className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300 rounded-md flex items-center"
                   >
                     <LogOut className="mr-2 h-4 w-4" />
@@ -277,11 +286,9 @@ const Header = () => {
                   >
                     Booking
                   </button>
-                  <button className="w-full text-left px-4 py-3 text-lg text-gray-700 hover:bg-gray-100 transition duration-300 rounded-md">
-                    Sign In
-                  </button>
+                
                   <button
-                    onClick={handleLogoutUser}
+                    onClick={handleLogout}
                     className="w-full text-left px-4 py-3 text-lg text-gray-700 hover:bg-gray-100 transition duration-300 rounded-md"
                   >
                     Logout
